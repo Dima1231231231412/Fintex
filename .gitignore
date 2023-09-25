@@ -2,3 +2,7 @@
 !README.md
 !.gitignore
 !/fintex
+/fintex/.gradle
+/fintex/.idea
+/fintex/build
+!/fintex/gradle/wrapper
