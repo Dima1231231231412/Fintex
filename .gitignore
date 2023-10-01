@@ -6,3 +6,8 @@
 /fintex/.idea
 /fintex/build
 !/fintex/gradle/wrapper
+!/SpringApp
+/SpringApp/.gradle
+/SpringApp/.idea
+/SpringApp/build
+!/SpringApp/gradle/wrapper
