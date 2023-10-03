@@ -5,11 +5,18 @@
       <profile name="Gradle Imported" enabled="true">
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
-          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.20/18bcea7d5df4d49227b4a0743a536208ce4825bb/lombok-1.18.20.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.26/8f8cf0372abf564913e9796623aac4c8ea44025a/lombok-1.18.26.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.vmware.test-operations/test-operations/1.1.0/f9b18f0d8fb9278eca279d5fad5c6a0f6b7d9ea1/test-operations-1.1.0.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/2.0.9/7cf2726fdcfbc8610f9a71fb3ed639871f315340/slf4j-api-2.0.9.jar" />
         </processorPath>
-        <module name="fintex.main" />
+        <module name="demo.main" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel target="18" />
+    <bytecodeTargetLevel target="17" />
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="SpringApp.main" options="--add-modules java.base" />
+    </option>
   </component>
 </project>
