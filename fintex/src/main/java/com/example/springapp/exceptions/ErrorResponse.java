@@ -1,9 +1,7 @@
 package com.example.springapp.exceptions;
 
-import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 
-import java.time.LocalDateTime;
 
 public class ErrorResponse extends BaseServiceException {
     public ErrorResponse(int status, String message, int errorCode) {

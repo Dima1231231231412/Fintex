@@ -1,15 +1,17 @@
 package com.example.springapp.service;
 
+import org.springframework.stereotype.Component;
+
 import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-
+@Component(value = "factoryWeather")
 public class FactoryWeather
 {
     //словарь для сопоставления региона с его идентификатором
-    static Map<String, Integer> mapIdReg = new HashMap<>();
+    public static Map<String, Integer> mapIdReg = new HashMap<>();
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
     public int generateId (String reg){

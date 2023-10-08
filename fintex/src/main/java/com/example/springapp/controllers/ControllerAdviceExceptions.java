@@ -1,28 +1,36 @@
 package com.example.springapp.controllers;
 
-import com.example.springapp.exceptions.BaseServiceException;
 import com.example.springapp.exceptions.ErrorResponse;
+import com.example.springapp.exceptions.WebClientExceptions;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
-@ControllerAdvice
+@RestControllerAdvice
 public class ControllerAdviceExceptions {
-    @ExceptionHandler(BaseServiceException.class)
-    public ResponseEntity<ErrorResponse> handleBaseException(ErrorResponse ex) {
-        ErrorResponse errorResponse = new ErrorResponse(ex.getStatus(), ex.getErrorMessage(), ex.getErrorCode());
+    @ExceptionHandler(ErrorResponse.class)
+    public ResponseEntity<Object> handleBaseException(ErrorResponse ex) {
+        ErrorResponse errorResponse = new ErrorResponse(ex.getStatus(), ex.getMessage(), ex.getErrorCode());
         log.error(ex.getMessage(), ex);
         return new ResponseEntity<>(errorResponse, HttpStatus.valueOf(ex.getStatus()));
+    }
+
+    @ExceptionHandler(WebClientExceptions.class)
+    public ResponseEntity<Object> handleInternalErrorException(WebClientExceptions ex) {
+        WebClientExceptions webClientExceptions = new WebClientExceptions(ex.getStatus(),ex.getMessage(),ex.getErrorCode());
+        log.error(ex.getMessage(),ex);
+        return new ResponseEntity<>(webClientExceptions,HttpStatus.valueOf(ex.getStatus()));
     }
 
     @ExceptionHandler(Throwable.class)
-    public ResponseEntity<ErrorResponse> unhandleException(ErrorResponse ex) {
-        ErrorResponse errorResponse = new ErrorResponse(ex.getStatus(), ex.getErrorMessage(), ex.getErrorCode());
+    public ResponseEntity<Object> unhandleException(Throwable ex) {
         log.error(ex.getMessage(), ex);
-        return new ResponseEntity<>(errorResponse, HttpStatus.valueOf(ex.getStatus()));
+        return new ResponseEntity<>(ex.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+
 }
 
