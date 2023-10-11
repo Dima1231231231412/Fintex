@@ -2,20 +2,19 @@ package com.example.springapp.service;
 
 
 import jakarta.annotation.PostConstruct;
-import org.springframework.context.annotation.Bean;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Component
 public class WeatherDao {
     public static List<Weather> weatherList;
 
     //инициализация данных
     @PostConstruct
-    public void init() {
+    public List<Weather> init() {
             FactoryWeather factoryWeather = new FactoryWeather();
             try {
                 weatherList = new ArrayList<>(List.of(
@@ -29,8 +28,10 @@ public class WeatherDao {
                         factoryWeather.createWeather("Moscow", 23, "2023-09-11T15:30"),
                         factoryWeather.createWeather("Moscow", 24, "2023-09-11T16:00")
                 ));
-            } catch (ParseException e) {
+            } catch (Exception e) {
+                log.error("Произошла ошибка при инициализации списка с погодой", e);
                 System.exit(-1);
             }
+            return weatherList;
     }
 }

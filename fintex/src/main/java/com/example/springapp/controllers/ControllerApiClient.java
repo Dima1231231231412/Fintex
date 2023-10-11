@@ -1,14 +1,14 @@
 package com.example.springapp.controllers;
 
+import com.example.springapp.service.CurrentWeatherDTO;
+import com.example.springapp.service.WeatherApiClientService;
 import io.github.resilience4j.ratelimiter.RateLimiter;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-
-import static com.example.springapp.service.WeatherService.getWebClientCurrentWeatherInCity;
-
 
 @RestController
 @RequestMapping("/api/weather/get")
@@ -18,9 +18,11 @@ public class ControllerApiClient {
     private final WebClient webClient;
     @Autowired
     private final RateLimiter rateLimiter;
+    @Autowired
+    WeatherApiClientService weatherApiClientService;
 
     @GetMapping("/{city}")
-    public Mono<Object> getCurrentWeatherInCity(@PathVariable String city) {
-        return  getWebClientCurrentWeatherInCity(city, webClient,rateLimiter);
+    public Mono<CurrentWeatherDTO> getCurrentWeatherInCity(@PathVariable String city, @Value("${weather-api.token}") String token) {
+        return  weatherApiClientService.getWebClientCurrentWeatherInCity(city, webClient,rateLimiter,token);
     }
 }

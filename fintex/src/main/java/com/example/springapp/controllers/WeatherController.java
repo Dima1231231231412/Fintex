@@ -8,10 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.text.ParseException;
 
-import static com.example.springapp.service.WeatherService.*;
 
 @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Successful operation", content = @Content(mediaType = "application/json")),

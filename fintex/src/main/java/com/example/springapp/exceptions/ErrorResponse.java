@@ -2,10 +2,9 @@ package com.example.springapp.exceptions;
 
 import org.springframework.http.HttpStatus;
 
-
-public class ErrorResponse extends BaseServiceException {
-    public ErrorResponse(int status, String message, int errorCode) {
-        super(status,message, errorCode);
+public class ErrorResponse extends BaseServiceException{
+    public ErrorResponse(int status,String message,int errorCode){
+        super(status,message,errorCode);
     }
 
     //Запись с температурой на сегодняшний день по городу не найдена
@@ -25,4 +24,3 @@ public class ErrorResponse extends BaseServiceException {
 
     }
 }
-

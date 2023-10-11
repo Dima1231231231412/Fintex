@@ -10,11 +10,11 @@ import java.time.Duration;
 @Configuration
 public class ResilienceConfig {
 
-    // Ограничение на 10 запросов в минуту
+    // Ограничение на 23 запроса в минуту (в месяц ~ 1.000.000)
     @Bean
     public RateLimiter rateLimiter() {
         RateLimiterConfig config = RateLimiterConfig.custom()
-                .limitForPeriod(10)
+                .limitForPeriod(23)
                 .limitRefreshPeriod(Duration.ofMinutes(1))
                 .build();
         return RateLimiter.of("weatherApiRateLimiter", config);

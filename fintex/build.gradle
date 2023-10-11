@@ -40,7 +40,10 @@ jar {
 	}
 
 }
-
+task run(type: JavaExec) {
+	main = 'com.example.springapp.FintechSpringBootApplication'
+	classpath = sourceSets.main.runtimeClasspath
+}
 task fatJar(type: Jar) {
 	//noinspection GroovyAssignabilityCheck
 	manifest {

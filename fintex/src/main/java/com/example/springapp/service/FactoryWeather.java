@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-@Component(value = "factoryWeather")
+@Component
 public class FactoryWeather
 {
     //словарь для сопоставления региона с его идентификатором

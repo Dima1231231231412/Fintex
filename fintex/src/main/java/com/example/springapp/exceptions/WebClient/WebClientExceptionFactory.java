@@ -1,16 +1,18 @@
 package com.example.springapp.exceptions.webClient;
 
-import org.springframework.http.HttpStatus;
-
-public class WebClientErrorCodeFactory {
-    //Получение статуса в зависимости от кода ошибки
-    public static int getStatusByErrorCode(int errorCode) {
-        return switch (errorCode) {
-            case 1002 -> new WebClientErrorApiKeyNotProvided();
-            case 2006 -> HttpStatus.UNAUTHORIZED.value();
-            case 1003, 1005, 1006, 9000, 9001 -> HttpStatus.BAD_REQUEST.value();
-            case 2007, 2008, 2009 -> HttpStatus.FORBIDDEN.value();
-            default -> HttpStatus.INTERNAL_SERVER_ERROR.value();
-        };
+public class WebClientExceptionFactory {
+    //Получение ошибки в зависимости от её кода
+    public static void getException(int errorCode) {
+        switch (errorCode) {
+            case 1002 -> throw new WebClientApiKeyNotProvidedException();
+            case 2006 -> throw new WebClientApiKeyProvidedIsInvalidException();
+            case 1003 -> throw new WebClientParameterQNotProvidedException();
+            case 1005 -> throw new WebClientApiRequestUrlIsInvalidException();
+            case 1006 -> throw new WebClientLocationNotFoundException();
+            case 2007 -> throw new WebClientApiKeyHasExceededCallsPerMonthQuotaException();
+            case 2008 -> throw new WebClientApiKeyHasBeenDisabledException();
+            case 2009 -> throw new WebClientApiKeyDoesNotHaveAccessToTheResourceException();
+            default -> throw new RuntimeException("Unknown error code");
+        }
     }
 }
