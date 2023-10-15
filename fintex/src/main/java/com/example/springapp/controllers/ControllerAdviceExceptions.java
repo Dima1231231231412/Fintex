@@ -1,28 +1,37 @@
 package com.example.springapp.controllers;
 
 import com.example.springapp.exceptions.BaseServiceException;
-import com.example.springapp.exceptions.ErrorResponse;
+import com.example.springapp.exceptions.MessageDTOException;
+import com.example.springapp.exceptions.webClient.BaseWebClientException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
-@ControllerAdvice
+@RestControllerAdvice
 public class ControllerAdviceExceptions {
     @ExceptionHandler(BaseServiceException.class)
-    public ResponseEntity<ErrorResponse> handleBaseException(ErrorResponse ex) {
-        ErrorResponse errorResponse = new ErrorResponse(ex.getStatus(), ex.getErrorMessage(), ex.getErrorCode());
+    public ResponseEntity<MessageDTOException> handleBaseException(BaseServiceException ex) {
+        MessageDTOException messageDTOException = new MessageDTOException(ex.getMessage());
         log.error(ex.getMessage(), ex);
-        return new ResponseEntity<>(errorResponse, HttpStatus.valueOf(ex.getStatus()));
+        return new ResponseEntity<>(messageDTOException, HttpStatus.valueOf(ex.getStatus()));
+    }
+
+    @ExceptionHandler(BaseWebClientException.class)
+    public ResponseEntity<MessageDTOException> handleWebClientException(BaseWebClientException ex) {
+        MessageDTOException messageDTOException = new MessageDTOException(ex.getMessage());
+        log.error(ex.getMessage(), ex);
+        return new ResponseEntity<>(messageDTOException, HttpStatus.valueOf(ex.getStatus()));
     }
 
     @ExceptionHandler(Throwable.class)
-    public ResponseEntity<ErrorResponse> unhandleException(ErrorResponse ex) {
-        ErrorResponse errorResponse = new ErrorResponse(ex.getStatus(), ex.getErrorMessage(), ex.getErrorCode());
+    public ResponseEntity<Object> unhandleException(Throwable ex) {
         log.error(ex.getMessage(), ex);
-        return new ResponseEntity<>(errorResponse, HttpStatus.valueOf(ex.getStatus()));
+        return new ResponseEntity<>(ex.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+
 }
 

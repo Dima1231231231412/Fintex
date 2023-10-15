@@ -1,15 +1,18 @@
-package com.example.springapp.exceptions;
+package com.example.springapp.exceptions.webClient;
 
+import com.example.springapp.exceptions.BaseServiceException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public abstract class BaseServiceException extends RuntimeException{
-    private final int status;
-    private final String message;
-    private final int errorCode;
+@AllArgsConstructor
+public class BaseWebClientException extends RuntimeException{
+    private int status;
+    private String message;
+    private int errorCode;
 
     //Исключение не нужной для пользователя информации при ошибки
     @JsonIgnore
@@ -27,5 +30,4 @@ public abstract class BaseServiceException extends RuntimeException{
     public String getLocalizedMessage() {
         return super.getLocalizedMessage();
     }
-
 }

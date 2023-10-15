@@ -25,6 +25,8 @@ dependencies {
 	annotationProcessor 'com.vmware.test-operations:test-operations:1.1.0'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation "io.github.resilience4j:resilience4j-all:2.0.2"
 }
 
 tasks.named('test') {
@@ -38,7 +40,10 @@ jar {
 	}
 
 }
-
+task run(type: JavaExec) {
+	main = 'com.example.springapp.FintechSpringBootApplication'
+	classpath = sourceSets.main.runtimeClasspath
+}
 task fatJar(type: Jar) {
 	//noinspection GroovyAssignabilityCheck
 	manifest {

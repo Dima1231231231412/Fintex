@@ -1,11 +1,4 @@
-!README.md
-!.gitignore
-!/Fintex
-/Fintex/.gradle
-/Fintex/.idea
-/Fintex/build
-!/Fintex/gradle/wrapper
-
+/.gradle/buildOutputCleanup
 HELP.md
 .gradle
 build/
