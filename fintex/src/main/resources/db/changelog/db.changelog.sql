@@ -1,17 +1,17 @@
 --  liquibase formatted sql
---  changeset Donskikh.D.:create-table
+--  changeset Donskikh.D.:create-table-city
 CREATE TABLE City (
     id int primary key auto_increment,
     name varchar(255) NOT NULL
 );
 
---  changeset Donskikh.D.:create-table
+--  changeset Donskikh.D.:create-table-weather_type
 CREATE TABLE Weather_type (
     id int primary key auto_increment,
     name varchar(255) NOT NULL
 );
 
---  changeset Donskikh.D.:create-table
+--  changeset Donskikh.D.:create-table-weather
 CREATE TABLE Weather (
     id int primary key auto_increment,
     city_id int NOT NULL,
@@ -22,7 +22,9 @@ CREATE TABLE Weather (
     FOREIGN KEY (weather_type_id) REFERENCES Weather_type(id) ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
-
+--changeset liquibase:create-index-table-weather
+CREATE INDEX weather_dateTimeMeasurement_index ON Weather (datetime_measurement);
+CREATE INDEX weather_cityId_weatherTypeId_index ON Weather (city_id,weather_type_id);
 
 --changeset liquibase:insert-rows-table-city
 INSERT INTO City (name)

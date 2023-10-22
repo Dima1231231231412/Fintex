@@ -1,22 +1,63 @@
 package com.example.springapp.database.DAO;
+import com.example.springapp.WebClientApiWeatherDTO;
 import com.example.springapp.database.entity.Weather;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import javax.sql.DataSource;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class WeatherJDBCDAO {
-    private final DataSource dataSource;
+public class WeatherJdbcDAO {
+    @Autowired
+    private final Connection connection;
+    @Autowired
+    private final TransactionTemplate transactionTemplate;
 
-    public WeatherJDBCDAO(DataSource dataSource) {
-        this.dataSource = dataSource;
+    public WeatherJdbcDAO(Connection connection, TransactionTemplate transactionTemplate) {
+        this.connection = connection;
+        this.transactionTemplate = transactionTemplate;
+    }
+
+    public boolean createWeather(WebClientApiWeatherDTO webClientApiWeatherDTO) throws SQLException {
+        try (connection) {
+            connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+
+            int city_id = findCityIdByName(webClientApiWeatherDTO.getCity());
+            if(city_id == 0){
+                boolean a = createCity(webClientApiWeatherDTO.getCity());
+                if(a)
+                    city_id = findCityIdByName(webClientApiWeatherDTO.getCity());
+            }
+
+            int weather_type_id = findWeatherTypeIdByName(webClientApiWeatherDTO.getWeatherType());
+            if(weather_type_id == 0){
+                boolean a = createWeatherType(webClientApiWeatherDTO.getWeatherType());
+                if(a)
+                    weather_type_id = findWeatherTypeIdByName(webClientApiWeatherDTO.getWeatherType());
+            }
+
+            PreparedStatement ps = connection.prepareStatement("INSERT INTO WEATHER (CITY_ID, TEMPERATURE, WEATHER_TYPE_ID,DATETIME_MEASUREMENT) VALUES (?,?,?,?)");
+            ps.setInt(1,city_id);
+            ps.setInt(2, (int) webClientApiWeatherDTO.getTemperature());
+            ps.setInt(3,weather_type_id);
+            ps.setTimestamp(4, webClientApiWeatherDTO.getDateTimeMeasurement());
+            ps.executeUpdate();
+            connection.commit();
+            return true;
+        } catch (SQLException ex) {
+            connection.rollback();
+            ex.printStackTrace();
+            return false;
+        }
     }
 
     public int findCityIdByName(String cityNameIn) throws SQLException {
-        PreparedStatement ps = dataSource.getConnection().prepareStatement("SELECT ID FROM CITY WHERE NAME=?");
+        PreparedStatement ps = connection.prepareStatement("SELECT ID FROM CITY WHERE NAME=?");
         ps.setString(1,cityNameIn);
         ResultSet resultSet = ps.executeQuery();
         int city_id = 0;
@@ -26,14 +67,14 @@ public class WeatherJDBCDAO {
         return city_id;
     }
 
-    public boolean createCity(String name) throws SQLException {
-        PreparedStatement ps = dataSource.getConnection().prepareStatement("INSERT INTO CITY (NAME) VALUES (?)");
-        ps.setString(1,name);
-        return ps.execute();
+    public boolean createCity(String cityName) throws SQLException {
+        PreparedStatement ps = connection.prepareStatement("INSERT INTO CITY (NAME) VALUES (?)");
+        ps.setString(1,cityName);
+        return ps.executeUpdate() == 1;
     }
 
     public short findWeatherTypeIdByName(String weatherTypeNameIn) throws SQLException {
-        PreparedStatement ps = dataSource.getConnection().prepareStatement("SELECT ID FROM WEATHER_TYPE WHERE NAME=?");
+        PreparedStatement ps = connection.prepareStatement("SELECT ID FROM WEATHER_TYPE WHERE NAME=?");
         ps.setString(1,weatherTypeNameIn);
         ResultSet resultSet = ps.executeQuery();
         short weather_type_id = 0;
@@ -44,13 +85,15 @@ public class WeatherJDBCDAO {
     }
 
     public boolean createWeatherType(String weatherTypeName) throws SQLException {
-        PreparedStatement ps = dataSource.getConnection().prepareStatement("INSERT INTO WEATHER_TYPE (NAME) VALUES (?)");
+        PreparedStatement ps = connection.prepareStatement("INSERT INTO WEATHER_TYPE (NAME) VALUES (?)");
         ps.setString(1,weatherTypeName);
-        return ps.execute();
+        return ps.executeUpdate() == 1;
     }
+
 
     //Создать запись с погодой
     //если название города или типа погоды отсутствуют в справочниках - создаст записи в справочниках
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public boolean createWeather(Weather weather) throws SQLException {
         int city_id = findCityIdByName(weather.getCityName());
         if(city_id == 0){
@@ -66,19 +109,19 @@ public class WeatherJDBCDAO {
                 weather_type_id = findWeatherTypeIdByName(weather.getWeatherTypeName());
         }
 
-        PreparedStatement ps = dataSource.getConnection().prepareStatement("INSERT INTO WEATHER (CITY_ID, TEMPERATURE, WEATHER_TYPE_ID,DATETIME_MEASUREMENT) VALUES (?,?,?,?)");
+        PreparedStatement ps = connection.prepareStatement("INSERT INTO WEATHER (CITY_ID, TEMPERATURE, WEATHER_TYPE_ID,DATETIME_MEASUREMENT) VALUES (?,?,?,?)");
         ps.setInt(1,city_id);
         ps.setInt(2, weather.getTemperature());
         ps.setInt(3,weather_type_id);
         ps.setTimestamp(4, weather.getDateTimeMeasurement());
-        return ps.execute();
+        return ps.executeUpdate() == 1;
     }
 
     //Получить все записи погоды по введённому городу
-    public List<Weather> getAllRecordsWeatherInCity(String city_name) throws SQLException {
-        PreparedStatement ps = dataSource.getConnection().prepareStatement("SELECT ID, CITY_ID, TEMPERATURE, WEATHER_TYPE_ID, DATETIME_MEASUREMENT FROM WEATHER " +
+    public List<Weather> getAllRecordsWeatherInCity(String cityName) throws SQLException {
+        PreparedStatement ps = connection.prepareStatement("SELECT ID, CITY_ID, TEMPERATURE, WEATHER_TYPE_ID, DATETIME_MEASUREMENT FROM WEATHER " +
                                                                 "WHERE CITY_ID = (SELECT ID FROM CITY WHERE NAME=?)");
-        ps.setString(1,city_name);
+        ps.setString(1,cityName);
         ResultSet res = ps.executeQuery();
         List<Weather> weatherList = new ArrayList<>();
         while (res.next()){
@@ -93,41 +136,54 @@ public class WeatherJDBCDAO {
     }
 
     //Удаление записи с погодой по введённому городу и дате со временем
-    public boolean deleteWeather(String city,Timestamp dateTime_measurement) throws SQLException {
-        PreparedStatement ps = dataSource.getConnection().prepareStatement("DELETE FROM WEATHER WHERE CITY_ID = (SELECT ID FROM CITY WHERE NAME = ?) AND DATETIME_MEASUREMENT=?");
+    public boolean deleteWeather(String city,Timestamp dateTimeMeasurement) throws SQLException {
+        PreparedStatement ps = connection.prepareStatement("DELETE FROM WEATHER WHERE CITY_ID = (SELECT ID FROM CITY WHERE NAME = ?) AND DATETIME_MEASUREMENT=?");
         ps.setString(1,city);
-        ps.setTimestamp(2,dateTime_measurement);
-        return ps.execute();
+        ps.setTimestamp(2,dateTimeMeasurement);
+        return ps.executeUpdate() == 1;
     }
 
     //Обновление погоды по текущему городу
-    public boolean updateWeather(Integer weather_id, String city, Integer temperature, String weather_type, Timestamp dateTime_measurement) throws SQLException {
-        int city_id = findCityIdByName(city);
-        if(city_id == 0){
-            return false;
-        }
-        System.out.println(city_id);
+    public boolean updateWeather(Integer weatherId, String city, Integer temperature, String weatherType, Timestamp dateTimeMeasurement) {
+        transactionTemplate.setIsolationLevel(TransactionDefinition.ISOLATION_READ_COMMITTED);
+        transactionTemplate.execute(status -> {
+            try{
+                int city_id = findCityIdByName(city);
+                if(city_id == 0){
+                    return false;
+                }
 
-        short weather_type_id = findWeatherTypeIdByName(weather_type);
-        if(weather_type_id == 0){
-            boolean resCreate = createWeatherType(weather_type);
-            if (resCreate){
-                weather_type_id = findWeatherTypeIdByName(weather_type);
+                short weather_type_id = findWeatherTypeIdByName(weatherType);
+                if(weather_type_id == 0){
+                    boolean resCreate = createWeatherType(weatherType);
+                    if (resCreate){
+                        weather_type_id = findWeatherTypeIdByName(weatherType);
+                    }
+                }
+                PreparedStatement ps = connection.prepareStatement("UPDATE WEATHER SET CITY_ID=?," +
+                        " TEMPERATURE = ?," +
+                        " WEATHER_TYPE_ID = ?," +
+                        " DATETIME_MEASUREMENT = ?" +
+                        "WHERE ID = ?");
+                ps.setInt(1,city_id);
+                ps.setInt(2,temperature);
+                ps.setShort(3, weather_type_id);
+                ps.setTimestamp(4,dateTimeMeasurement);
+                ps.setInt(5,weatherId);
+                boolean res = ps.executeUpdate() == 1;
+                connection.commit();
+                return res;
             }
-        }
-        System.out.println(weather_type_id);
-        PreparedStatement ps = dataSource.getConnection().prepareStatement("UPDATE WEATHER SET CITY_ID=?," +
-                                                                                    " TEMPERATURE = ?," +
-                                                                                    " WEATHER_TYPE_ID = ?," +
-                                                                                    " DATETIME_MEASUREMENT = ?" +
-                                                                "WHERE ID = ?");
-        ps.setInt(1,city_id);
-        ps.setInt(2,temperature);
-        ps.setShort(3,weather_type_id);
-        ps.setTimestamp(4,dateTime_measurement);
-        ps.setInt(5,weather_id);
-        return ps.execute();
+            catch (SQLException e){
+                status.setRollbackOnly();
+                e.printStackTrace();
+                return false;
+            }
+        });
+        return true;
     }
+
+
 
 
 }
