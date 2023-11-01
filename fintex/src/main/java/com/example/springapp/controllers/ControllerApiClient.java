@@ -27,26 +27,20 @@ public class ControllerApiClient {
     WeatherApiClientService weatherApiClientService;
     @Autowired
     WeatherMapper weatherMapper;
-    private final WeathDao weathDao;
 
     public ControllerApiClient(WebClient webClient,
                                RateLimiter rateLimiter,
                                WeatherApiClientService weatherApiClientService,
-                               WeatherMapper weatherMapper,
-                               @Qualifier("weatherDaoJdbc") WeathDao weathDao) {
+                               WeatherMapper weatherMapper) {
         this.webClient = webClient;
         this.rateLimiter = rateLimiter;
         this.weatherApiClientService = weatherApiClientService;
         this.weatherMapper = weatherMapper;
-        this.weathDao = weathDao;
     }
 
 
     @GetMapping("/{city}")
-    public CurrentWeatherDTO getCurrentWeatherInCity(@PathVariable String city) throws SQLException {
-        CurrentWeatherDTO jsonCurrentWeather = weatherApiClientService.getWebClientCurrentWeatherInCity(city, webClient, rateLimiter);
-        Weather weather = new WeatherMapper().of(jsonCurrentWeather);
-        weathDao.save(weather);
-        return jsonCurrentWeather;
+    public CurrentWeatherDTO getAndAddCurrentWeatherInCity(@PathVariable String city) throws SQLException {
+        return weatherApiClientService.addCurrentWeather(city, webClient, rateLimiter);
     }
 }
