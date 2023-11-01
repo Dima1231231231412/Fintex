@@ -21,7 +21,7 @@ public class WeatherDao {
                         factoryWeather.createWeather("Vladimir", 21, "2023-10-08T09:30"),
                         factoryWeather.createWeather("Vladimir", 23, "2023-09-27T12:00"),
                         factoryWeather.createWeather("Vladimir", 24, "2023-09-13T13:30"),
-                        factoryWeather.createWeather("Ryazan", 23, "2023-09-14T15:00"),
+                        factoryWeather.createWeather("Ryazan", 23, "2023-10-29T15:00"),
                         factoryWeather.createWeather("Ryazan", 22, "2023-09-14T16:30"),
                         factoryWeather.createWeather("Ryazan", 26, "2023-09-14T13:00"),
                         factoryWeather.createWeather("Moscow", 25, "2023-09-11T12:30"),
