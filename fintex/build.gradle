@@ -36,6 +36,7 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.7.3'
 	testImplementation "org.testcontainers:junit-jupiter:1.17.6"
+	implementation("org.liquibase:liquibase-core")
 }
 
 tasks.named('test') {
