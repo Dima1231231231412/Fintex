@@ -1,7 +1,7 @@
 package com.example.springapp.service;
 
 import com.example.springapp.exceptions.ErrorResponse;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.time.LocalDate;
@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 import static com.example.springapp.service.FactoryWeather.mapIdReg;
 
-@Component
+@Service
 public class WeatherService {
 
     public Map<LocalDateTime,Integer> getTemperatureForDayInCity(String city)  {

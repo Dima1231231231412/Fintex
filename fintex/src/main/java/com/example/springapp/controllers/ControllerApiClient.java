@@ -1,28 +1,38 @@
 package com.example.springapp.controllers;
 
+import com.example.springapp.WeatherMapper;
+import com.example.springapp.database.DAO.WeathDao;
+import com.example.springapp.database.entity.Weather;
 import com.example.springapp.service.CurrentWeatherDTO;
 import com.example.springapp.service.WeatherApiClientService;
 import io.github.resilience4j.ratelimiter.RateLimiter;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
+
+import java.sql.SQLException;
 
 @RestController
 @RequestMapping("/api/weather/get")
-@AllArgsConstructor
 public class ControllerApiClient {
     @Autowired
     private final WebClient webClient;
     @Autowired
-    private final RateLimiter rateLimiter;
-    @Autowired
     WeatherApiClientService weatherApiClientService;
 
+    public ControllerApiClient(WebClient webClient,
+                               WeatherApiClientService weatherApiClientService) {
+        this.webClient = webClient;
+        this.weatherApiClientService = weatherApiClientService;
+    }
+
+
     @GetMapping("/{city}")
-    public Mono<CurrentWeatherDTO> getCurrentWeatherInCity(@PathVariable String city, @Value("${weather-api.token}") String token) {
-        return  weatherApiClientService.getWebClientCurrentWeatherInCity(city, webClient,rateLimiter,token);
+    public CurrentWeatherDTO getAndAddCurrentWeatherInCity(@PathVariable String city) throws SQLException {
+        return weatherApiClientService.addCurrentWeather(city, webClient);
     }
 }
