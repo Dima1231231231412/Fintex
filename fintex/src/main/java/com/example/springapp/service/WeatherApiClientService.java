@@ -23,12 +23,14 @@ public class WeatherApiClientService {
     @Autowired
     Environment env;
     private final WeathDao weathDao;
+    @Autowired
+    RateLimiter rateLimiter;
 
     public WeatherApiClientService(@Qualifier("weatherDaoJdbc") WeathDao weathDao) {
         this.weathDao = weathDao;
     }
 
-    public CurrentWeatherDTO getWebClientCurrentWeatherInCity(String city, WebClient webClient, RateLimiter rateLimiter) {
+    public CurrentWeatherDTO getWebClientCurrentWeatherInCity(String city, WebClient webClient) {
         if (!rateLimiter.acquirePermission()) {
             //Приведение типа, чтобы не ругалось на возвращаемый тип
             return (CurrentWeatherDTO) Mono.error(new WebClientRequestLimitExceededException()).block();
@@ -46,8 +48,8 @@ public class WeatherApiClientService {
                 .bodyToMono(CurrentWeatherDTO.class).block();
     }
 
-    public CurrentWeatherDTO addCurrentWeather(String city, WebClient webClient, RateLimiter rateLimiter) throws SQLException {
-        CurrentWeatherDTO jsonCurrentWeather = getWebClientCurrentWeatherInCity(city, webClient, rateLimiter);
+    public CurrentWeatherDTO addCurrentWeather(String city, WebClient webClient) throws SQLException {
+        CurrentWeatherDTO jsonCurrentWeather = getWebClientCurrentWeatherInCity(city, webClient);
         Weather weather = new WeatherMapper().of(jsonCurrentWeather);
         weathDao.save(weather);
         return jsonCurrentWeather;

@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 import java.util.List;
 
-@EnableJpaRepositories
 @Repository
 public interface WeatherJpa extends JpaRepository<Weather,Integer> {
 

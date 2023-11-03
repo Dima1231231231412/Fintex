@@ -22,25 +22,17 @@ public class ControllerApiClient {
     @Autowired
     private final WebClient webClient;
     @Autowired
-    private final RateLimiter rateLimiter;
-    @Autowired
     WeatherApiClientService weatherApiClientService;
-    @Autowired
-    WeatherMapper weatherMapper;
 
     public ControllerApiClient(WebClient webClient,
-                               RateLimiter rateLimiter,
-                               WeatherApiClientService weatherApiClientService,
-                               WeatherMapper weatherMapper) {
+                               WeatherApiClientService weatherApiClientService) {
         this.webClient = webClient;
-        this.rateLimiter = rateLimiter;
         this.weatherApiClientService = weatherApiClientService;
-        this.weatherMapper = weatherMapper;
     }
 
 
     @GetMapping("/{city}")
     public CurrentWeatherDTO getAndAddCurrentWeatherInCity(@PathVariable String city) throws SQLException {
-        return weatherApiClientService.addCurrentWeather(city, webClient, rateLimiter);
+        return weatherApiClientService.addCurrentWeather(city, webClient);
     }
 }

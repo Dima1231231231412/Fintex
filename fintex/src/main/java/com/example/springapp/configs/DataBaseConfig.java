@@ -1,29 +1,27 @@
 package com.example.springapp.configs;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.support.TransactionTemplate;
+
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Objects;
 
 @Configuration
 @EnableTransactionManagement
 public class DataBaseConfig {
-    @Autowired
-    Environment env;
+    @Value("${spring.datasource.url}") String url;
+    @Value("${spring.datasource.driver-class-name}") String driverClassName;
+
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName(Objects.requireNonNull(env.getProperty("spring.datasource.driver-class-name")));
-        dataSource.setUrl(env.getProperty("spring.datasource.url"));
+        dataSource.setDriverClassName(driverClassName);
+        dataSource.setUrl(url);
         return dataSource;
     }
 
