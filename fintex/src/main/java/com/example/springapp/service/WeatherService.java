@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.example.springapp.service.FactoryWeather.mapIdReg;
@@ -69,3 +69,4 @@ public class WeatherService {
 
     }
 }
+

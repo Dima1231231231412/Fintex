@@ -8,10 +8,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -102,27 +104,27 @@ public class H2Tests {
     public void testCreateWeather() throws SQLException {
         tablesScriptSql.createTableWeather();
         // Тестируемые данные
-        WebClientApiWeatherDTO webClientApiWeatherDTO = new WebClientApiWeatherDTO(
-                "Rostov",-5f,"Ветер с дождём",Timestamp.valueOf("2023-10-28 21:45:00")
+        com.example.springapp.database.entity.Weather weather = new com.example.springapp.database.entity.Weather(
+                0,"Rostov",-5,"Ветер с дождём",Timestamp.valueOf("2023-10-28 21:45:00")
         );
 
         // Если город/тип погоды не существует - заносим данные в соответствующие таблицы
-        int city_id = findCityIdByName(webClientApiWeatherDTO.getCity());
+        int city_id = findCityIdByName(weather.getCityName());
         if(city_id == 0){
-            boolean a = createCity(webClientApiWeatherDTO.getCity());
+            boolean a = createCity(weather.getCityName());
             if(a)
-                city_id = findCityIdByName(webClientApiWeatherDTO.getCity());
+                city_id = findCityIdByName(weather.getCityName());
         }
 
-        int weather_type_id = findWeatherTypeIdByName(webClientApiWeatherDTO.getWeatherType());
+        int weather_type_id = findWeatherTypeIdByName(weather.getWeatherTypeName());
         if(weather_type_id == 0){
-            boolean a = createWeatherType(webClientApiWeatherDTO.getWeatherType());
+            boolean a = createWeatherType(weather.getWeatherTypeName());
             if(a)
-                weather_type_id = findWeatherTypeIdByName(webClientApiWeatherDTO.getWeatherType());
+                weather_type_id = findWeatherTypeIdByName(weather.getWeatherTypeName());
         }
 
         // Добавление погоды в БД
-        createWeather(city_id,(int) webClientApiWeatherDTO.getTemperature(),weather_type_id,webClientApiWeatherDTO.getDateTimeMeasurement());
+        createWeather(city_id, weather.getTemperature(),weather_type_id,weather.getDateTimeMeasurement());
 
         // Десериализация добавленных данных в Weather
         Weather addedWeather = jdbcTemplate.queryForObject("SELECT * FROM WEATHER WHERE CITY_ID=? AND DATETIME_MEASUREMENT=?",
@@ -133,7 +135,7 @@ public class H2Tests {
                         resultSet.getInt(4),
                         resultSet.getTimestamp(5)
                 ),
-                city_id,webClientApiWeatherDTO.getDateTimeMeasurement());
+                city_id,weather.getDateTimeMeasurement());
 
         // Получаем название города и типы погоды по идентификаторам из Weather
         String cityName = jdbcTemplate.queryForObject("SELECT NAME FROM CITY WHERE ID=?",String.class,addedWeather.getCityId());
@@ -141,10 +143,10 @@ public class H2Tests {
 
         assertAll(
                 "Grouped Assertions of Weather",
-                () -> assertThat(webClientApiWeatherDTO.getCity()).isEqualTo(cityName), // Successful
-                () -> assertThat(webClientApiWeatherDTO.getTemperature()).isEqualTo(addedWeather.getTemperature()+1), // Fatal
-                () -> assertThat(webClientApiWeatherDTO.getDateTimeMeasurement()).isEqualTo(addedWeather.getDateTimeMeasurement()), // Successful
-                () -> assertThat(webClientApiWeatherDTO.getWeatherType()).isEqualTo(weatherName) // Successful
+                () -> assertThat(weather.getCityName()).isEqualTo(cityName), // Successful
+                () -> assertThat(weather.getTemperature()).isEqualTo(addedWeather.getTemperature()+1), // Fatal
+                () -> assertThat(weather.getDateTimeMeasurement()).isEqualTo(addedWeather.getDateTimeMeasurement()), // Successful
+                () -> assertThat(weather.getWeatherTypeName()).isEqualTo(weatherName) // Successful
         );
     }
 

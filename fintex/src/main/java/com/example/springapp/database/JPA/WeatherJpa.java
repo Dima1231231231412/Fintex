@@ -5,7 +5,6 @@ import com.example.springapp.database.entity.Weather;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
@@ -29,3 +28,4 @@ public interface WeatherJpa extends JpaRepository<Weather,Integer> {
     Weather findWeatherByCityNameAndAndWeatherTypeNameAndDateTimeMeasurement(String cityName,String weatherType,Timestamp datetimeMeasurement);
 
 }
+

@@ -288,3 +288,4 @@ databaseChangeLog:
            indexName:  weather_cityId_weatherTypeId_index
            schemaName:  public
            tableName:  weather
+

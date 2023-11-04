@@ -1,18 +1,20 @@
 package com.example.springapp;
 
-import com.example.springapp.controllers.ControllerApiClient;
 import com.example.springapp.service.CurrentWeatherDTO;
+import com.example.springapp.service.WeatherApiClientService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
-import org. junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation. Autowired;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.test. web.servlet.result. MockMvcResultMatchers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.web.reactive.function.client.WebClient;
+
 import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
@@ -21,7 +23,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 public class ControllerApiClientTests {
 
     @Autowired
-    private ControllerApiClient controllerApiClient;
+    private WeatherApiClientService weatherApiClientService;
+    @Autowired
+    private WebClient webClient;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -30,7 +34,7 @@ public class ControllerApiClientTests {
     @Test
     public void testGetCurrentWeatherInCity() throws Exception {
         String cityName = "Moscow";
-        CurrentWeatherDTO actualWeather = controllerApiClient.getCurrentWeatherInCity(cityName);
+        CurrentWeatherDTO actualWeather = weatherApiClientService.getWebClientCurrentWeatherInCity(cityName,webClient);
         String responseJson = webTestClient.get().uri("/api/weather/get/{city}", cityName)
                 .exchange()
                 .expectStatus().isOk()
