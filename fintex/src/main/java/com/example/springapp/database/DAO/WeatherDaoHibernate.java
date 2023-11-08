@@ -85,3 +85,4 @@ public class WeatherDaoHibernate implements  WeathDao{
         weatherJpa.delete(entity);
     }
 }
+

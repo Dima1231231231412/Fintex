@@ -3,6 +3,7 @@ package com.example.springapp.database.DAO;
 import com.example.springapp.database.entity.City;
 import com.example.springapp.database.entity.Weather;
 import com.example.springapp.database.entity.WeatherType;
+
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
@@ -25,3 +26,4 @@ public interface WeathDao {
     WeatherType findWeatherTypeByName (String name) throws SQLException;
     void updateWeatherTypeName(Integer id,String name) throws SQLException;
 }
+
