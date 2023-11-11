@@ -1,4 +1,4 @@
-package com.example.springapp;
+package com.example.springapp.mappers;
 
 import com.example.springapp.database.entity.Weather;
 import com.example.springapp.service.CurrentWeatherDTO;

@@ -1,11 +1,11 @@
 package com.example.springapp.service;
 
-import com.example.springapp.WeatherMapper;
 import com.example.springapp.database.DAO.WeathDao;
 import com.example.springapp.database.entity.Weather;
 import com.example.springapp.exceptions.webClient.WeatherApiErrorsDTO;
 import com.example.springapp.exceptions.webClient.WebClientExceptionFactory;
 import com.example.springapp.exceptions.webClient.WebClientRequestLimitExceededException;
+import com.example.springapp.mappers.WeatherMapper;
 import io.github.resilience4j.ratelimiter.RateLimiter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
