@@ -1,0 +1,52 @@
+databaseChangeLog:
+  - changeSet:
+      id: 8
+      author: Donskikh D.
+      comment: "Create table users"
+      changes:
+        - createTable:
+            tableName: USERS
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: username
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: password
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: role
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+                    default: "USER"
+
+
+  - changeSet:
+      id: 9
+      author: Donskikh D.
+      comment: "Insert admin in table 'USERS'"
+      changes:
+        - insert:
+            tableName: USERS
+            columns:
+              - column:
+                  name: username
+                  value: "admin@mail.ru"
+              - column:
+                  name: password
+                  value: "$2a$10$U6bR0g.xU21VXzXDc.MHzOCeJ9ul669yAwHy3rFfwTuZJ.FCGKs8K"
+              - column:
+                  name: role
+                  value: "ADMIN"
