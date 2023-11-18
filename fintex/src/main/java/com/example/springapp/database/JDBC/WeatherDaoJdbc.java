@@ -347,5 +347,25 @@ public class WeatherDaoJdbc implements WeathDao {
         }
     }
 
+    public Weather getWeatherForCityNameAndDateTimeMeasurement(Weather weather) throws SQLException {
+        Connection connection = dataSource.getConnection();
+        try (connection){
+            PreparedStatement ps = connection.prepareStatement("SELECT W.ID,C.NAME,W.TEMPERATURE,WT.NAME,W.DATETIME_MEASUREMENT FROM " +
+                    "WEATHER W INNER JOIN WEATHER_TYPE WT on W.WEATHER_TYPE_ID = WT.ID INNER JOIN CITY C on C.ID = W.CITY_ID " +
+                    "WHERE C.NAME = ? AND W.DATETIME_MEASUREMENT=?");
+            ps.setString(1,weather.getCityName());
+            ps.setTimestamp(2,weather.getDateTimeMeasurement());
+            ResultSet rs = ps.executeQuery();
+            Weather findWeather = new Weather();
+            if(rs.next()){
+                findWeather.setId(rs.getInt(1));
+                findWeather.setCityName(rs.getString(2));
+                findWeather.setTemperature(rs.getInt(3));
+                findWeather.setWeatherTypeName(rs.getString(4));
+                findWeather.setDateTimeMeasurement(rs.getTimestamp(5));
+            }
+            return findWeather;
+        }
+    }
 }
 
