@@ -34,7 +34,7 @@ public class ControllerApiClientTests {
     @Test
     public void testGetCurrentWeatherInCity() throws Exception {
         String cityName = "Moscow";
-        CurrentWeatherDTO actualWeather = weatherApiClientService.getWebClientCurrentWeatherInCity(cityName,webClient);
+        CurrentWeatherDTO actualWeather = weatherApiClientService.getWebClientCurrentWeatherInCity(cityName);
         String responseJson = webTestClient.get().uri("/api/weather/get/{city}", cityName)
                 .exchange()
                 .expectStatus().isOk()
