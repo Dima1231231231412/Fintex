@@ -367,5 +367,24 @@ public class WeatherDaoJdbc implements WeathDao {
             return findWeather;
         }
     }
+
+    public float getAvgTemperatureInCityIn30records(String city) throws SQLException {
+        Connection connection = dataSource.getConnection();
+        try (connection){
+            PreparedStatement ps = connection.prepareStatement("SELECT ROUND(AVG(TEMPERATURE),1) FROM \n" +
+                    "(SELECT W.TEMPERATURE\n" +
+                    "FROM WEATHER W INNER JOIN CITY C on C.ID = W.CITY_ID\n" +
+                    "WHERE C.NAME = ? \n" +
+                    "ORDER BY DATETIME_MEASUREMENT DESC\n" +
+                    "LIMIT 30)");
+            ps.setString(1,city);
+            ResultSet rs = ps.executeQuery();
+            float avgTempCity = 0;
+            if(rs.next()){
+                avgTempCity = rs.getFloat(1);
+            }
+            return avgTempCity;
+        }
+    }
 }
 
