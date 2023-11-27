@@ -2,7 +2,8 @@ package com.example.springapp.cache;
 
 import org.springframework.beans.factory.annotation.Value;
 
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -11,13 +12,15 @@ public class Cache<T> implements CacheDao<T> {
     private int size;
     public final Map<Object, Node<T>> keysMap;
     public Node<T> linkedList;
+    public Integer minutesCache;
 
-    public Cache() {
-        keysMap = new HashMap<>(size);
+    public Cache(Integer minutesCache) {
+        keysMap = Collections.synchronizedMap(new LinkedHashMap<>(size));
         linkedList = null;
+        this.minutesCache = minutesCache;
     }
 
-    public void moveNodeToHead(Node<T> node) {
+    public synchronized void moveNodeToHead(Node<T> node) {
         if (node == linkedList) {
             return;
         }
@@ -35,7 +38,7 @@ public class Cache<T> implements CacheDao<T> {
         linkedList = node;
     }
 
-    public void addNodeToHead(Node<T> node) {
+    public synchronized void addNodeToHead(Node<T> node) {
         if (linkedList == null) {
             linkedList = node;
         } else {
@@ -45,7 +48,7 @@ public class Cache<T> implements CacheDao<T> {
         }
     }
 
-    public void removeTailNode() {
+    public synchronized void removeTailNode() {
         // Поиск начального узла двусвязанного списка
         while (linkedList.previousNode != null) {
             linkedList = linkedList.previousNode;
@@ -58,7 +61,7 @@ public class Cache<T> implements CacheDao<T> {
     }
 
     @Override
-    public T get(Object key, Supplier<T> supplier) {
+    public synchronized  T get(Object key, Supplier<T> supplier) {
         if (keysMap.containsKey(key)) {
             Node<T> node = keysMap.get(key);
             moveNodeToHead(node);
@@ -75,7 +78,7 @@ public class Cache<T> implements CacheDao<T> {
         }
     }
 
-    public static <K, V> K getKey(Map<K, V> map, V value)
+    public static synchronized  <K, V> K getKey(Map<K, V> map, V value)
     {
         for (Map.Entry<K, V> entry: map.entrySet())
         {

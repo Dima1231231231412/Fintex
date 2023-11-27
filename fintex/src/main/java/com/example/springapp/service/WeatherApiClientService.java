@@ -20,7 +20,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.sql.SQLException;
-
+import java.time.LocalDateTime;
+import java.util.Map;
 
 @Component
 public class WeatherApiClientService {
@@ -62,19 +63,24 @@ public class WeatherApiClientService {
     }
 
     public Weather getCurrentWeatherCache(String location) throws SQLException {
-        CurrentWeatherDTO jsonCurrentWeather = getWebClientCurrentWeatherInCity(location);
-        Weather weather = new WeatherMapper().of(jsonCurrentWeather);
+        Map<Object,Node<Weather>> weatherCacheMap = weatherCache.keysMap;
 
-        if(weatherCache.keysMap.containsKey(location)){
-            Node<Weather> node =  weatherCache.keysMap.get(location);
-            if(node.value.getDateTimeMeasurement().compareTo(weather.getDateTimeMeasurement()) != 0){
-                weatherCache.keysMap.remove(location);
+        if(weatherCacheMap.containsKey(location)){
+            Node<Weather> node =  weatherCacheMap.get(location);
+            Weather nodeValue = node.value;
+            if(Math.abs(LocalDateTime.now().getMinute() - nodeValue.getDateTimeMeasurement().getMinutes()) > weatherCache.minutesCache){
+                weatherCacheMap.remove(location);
+
+                CurrentWeatherDTO jsonCurrentWeather = getWebClientCurrentWeatherInCity(location);
+                Weather weather = new WeatherMapper().of(jsonCurrentWeather);
                 //Помещаем объект в кэш
                 return weatherCache.get(location,()-> weather);
             }
             //Получаем из кэша
-            return weatherCache.get(location,()-> weather);
+            return weatherCache.get(location,()-> nodeValue);
         }
+        CurrentWeatherDTO jsonCurrentWeather = getWebClientCurrentWeatherInCity(location);
+        Weather weather = new WeatherMapper().of(jsonCurrentWeather);
 
         Weather findWeather = weatherDaoJdbc.getWeatherForCityNameAndDateTimeMeasurement(weather);
 

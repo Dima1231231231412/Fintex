@@ -8,6 +8,6 @@ import org.springframework.stereotype.Component;
 public class CacheComponents {
     @Bean
     public Cache<Weather> cacheWeather (){
-        return new Cache<>();
+        return new Cache<>(15);
     }
 }
