@@ -1,6 +1,6 @@
 package com.example.springapp.controllers;
 
-import com.example.springapp.service.CurrentWeatherDTO;
+import com.example.springapp.database.entity.Weather;
 import com.example.springapp.service.WeatherApiClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,20 +16,18 @@ import java.sql.SQLException;
 @RequestMapping("/api/weather/get")
 public class ControllerApiClient {
     @Autowired
-    private final WebClient webClient;
+    WebClient webClient;
     @Autowired
     WeatherApiClientService weatherApiClientService;
 
-    public ControllerApiClient(WebClient webClient,
-                               WeatherApiClientService weatherApiClientService) {
+    public ControllerApiClient(WebClient webClient) {
         this.webClient = webClient;
-        this.weatherApiClientService = weatherApiClientService;
     }
 
 
     @GetMapping("/{city}")
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
-    public CurrentWeatherDTO getAndAddCurrentWeatherInCity(@PathVariable String city) throws SQLException {
-        return weatherApiClientService.addCurrentWeather(city, webClient);
+    public Weather getAndAddCurrentWeatherInCity(@PathVariable String city) throws SQLException {
+        return weatherApiClientService.getCurrentWeatherCache(city);
     }
 }
